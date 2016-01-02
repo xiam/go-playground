@@ -1,34 +1,55 @@
 <!doctype html>
 <html>
-	<head>
-		<title>The Go Playground</title>
-		<link rel="stylesheet" href="/static/example.css">
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-		<script src="/static/playground.js"></script>
-		<script src="/static/snippets.js"></script>
+  <head>
+    <title>The Go Playground</title>
+    <link rel="stylesheet" href="/static/example.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="/static/playground.js"></script>
+    <script src="/static/snippets.js"></script>
 
     <link rel="shortcut icon" href="/static/favicon.ico" sizes="16x16 32x32" type="image/vnd.microsoft.icon">
 
-		<script>
-			goPlaygroundOptions({
-				'shareRedirect': '/p/'
-			});
-		</script>
-	</head>
-	<body>
+    <style type="text/css" rel="stylesheet">
+      html {
+        height: 100%;
+      }
+      body {
+        font-family: Helvetica, Arial, sans-serif;
+        color: black;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #wrap {
+        padding: 5px;
+        margin: 0;
+      }
+      a {
+        color: #009;
+      }
+    </style>
 
-	<h2>Inline snippet example</h2>
-<textarea class="go-playground-snippet" data-title="Example (Hello World!)">
+    <script>
+      goPlaygroundOptions({
+        'shareRedirect': '/p/'
+      });
+    </script>
+  </head>
+  <body>
+
+    <div id="wrap">
+      <h2>Inline snippet example</h2>
+        <textarea class="go-playground-snippet" data-title="Example (Hello World!)">
 package main
 
 import (
-	"fmt"
+  "fmt"
 )
 
 func main() {
-	fmt.Printf("Hello world!")
-}
-</textarea>
-
-	</body>
+  fmt.Printf("Hello world!")
+}</textarea>
+      <div>
+  </body>
 </html>

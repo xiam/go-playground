@@ -11,7 +11,7 @@ here's a skeleton implementation of a playground transport.
                 return {
                         Run: function(body, output, options) {
                                 // Compile and run the program 'body' with 'options'.
-				// Call the 'output' callback to display program output.
+        // Call the 'output' callback to display program output.
                                 return {
                                         Kill: function() {
                                                 // Kill the running program.
@@ -21,193 +21,193 @@ here's a skeleton implementation of a playground transport.
                 };
         }
 
-	// The output callback is called multiple times, and each time it is
-	// passed an object of this form.
+  // The output callback is called multiple times, and each time it is
+  // passed an object of this form.
         var write = {
                 Kind: 'string', // 'start', 'stdout', 'stderr', 'end'
                 Body: 'string'  // content of write or end status message
         }
 
-	// The first call must be of Kind 'start' with no body.
-	// Subsequent calls may be of Kind 'stdout' or 'stderr'
-	// and must have a non-null Body string.
-	// The final call should be of Kind 'end' with an optional
-	// Body string, signifying a failure ("killed", for example).
+  // The first call must be of Kind 'start' with no body.
+  // Subsequent calls may be of Kind 'stdout' or 'stderr'
+  // and must have a non-null Body string.
+  // The final call should be of Kind 'end' with an optional
+  // Body string, signifying a failure ("killed", for example).
 
-	// The output callback must be of this form.
-	// See PlaygroundOutput (below) for an implementation.
+  // The output callback must be of this form.
+  // See PlaygroundOutput (below) for an implementation.
         function outputCallback(write) {
         }
 */
 
 function HTTPTransport() {
-	'use strict';
+  'use strict';
 
-	// TODO(adg): support stderr
+  // TODO(adg): support stderr
 
-	function playback(output, events) {
-		var timeout;
-		output({Kind: 'start'});
-		function next() {
-			if (!events || events.length === 0) {
-				output({Kind: 'end'});
-				return;
-			}
-			var e = events.shift();
-			if (e.Delay === 0) {
-				output({Kind: 'stdout', Body: e.Message});
-				next();
-				return;
-			}
-			timeout = setTimeout(function() {
-				output({Kind: 'stdout', Body: e.Message});
-				next();
-			}, e.Delay / 1000000);
-		}
-		next();
-		return {
-			Stop: function() {
-				clearTimeout(timeout);
-			}
-		}
-	}
+  function playback(output, events) {
+    var timeout;
+    output({Kind: 'start'});
+    function next() {
+      if (!events || events.length === 0) {
+        output({Kind: 'end'});
+        return;
+      }
+      var e = events.shift();
+      if (e.Delay === 0) {
+        output({Kind: 'stdout', Body: e.Message});
+        next();
+        return;
+      }
+      timeout = setTimeout(function() {
+        output({Kind: 'stdout', Body: e.Message});
+        next();
+      }, e.Delay / 1000000);
+    }
+    next();
+    return {
+      Stop: function() {
+        clearTimeout(timeout);
+      }
+    }
+  }
 
-	function error(output, msg) {
-		output({Kind: 'start'});
-		output({Kind: 'stderr', Body: msg});
-		output({Kind: 'end'});
-	}
+  function error(output, msg) {
+    output({Kind: 'start'});
+    output({Kind: 'stderr', Body: msg});
+    output({Kind: 'end'});
+  }
 
-	var seq = 0;
-	return {
-		Run: function(body, output, options) {
-			seq++;
-			var cur = seq;
-			var playing;
-			$.ajax('/compile', {
-				type: 'POST',
-				data: {'version': 2, 'body': body},
-				dataType: 'json',
-				success: function(data) {
-					if (seq != cur) return;
-					if (!data) return;
-					if (playing != null) playing.Stop();
-					if (data.Errors) {
-						error(output, data.Errors);
-						return;
-					}
-					playing = playback(output, data.Events);
-				},
-				error: function() {
-					error(output, 'Error communicating with remote server.');
-				}
-			});
-			return {
-				Kill: function() {
-					if (playing != null) playing.Stop();
-					output({Kind: 'end', Body: 'killed'});
-				}
-			};
-		}
-	};
+  var seq = 0;
+  return {
+    Run: function(body, output, options) {
+      seq++;
+      var cur = seq;
+      var playing;
+      $.ajax('/compile', {
+        type: 'POST',
+        data: {'version': 2, 'body': body},
+        dataType: 'json',
+        success: function(data) {
+          if (seq != cur) return;
+          if (!data) return;
+          if (playing != null) playing.Stop();
+          if (data.Errors) {
+            error(output, data.Errors);
+            return;
+          }
+          playing = playback(output, data.Events);
+        },
+        error: function() {
+          error(output, 'Error communicating with remote server.');
+        }
+      });
+      return {
+        Kill: function() {
+          if (playing != null) playing.Stop();
+          output({Kind: 'end', Body: 'killed'});
+        }
+      };
+    }
+  };
 }
 
 function SocketTransport() {
-	'use strict';
+  'use strict';
 
-	var id = 0;
-	var outputs = {};
-	var started = {};
-	var websocket = new WebSocket('ws://' + window.location.host + '/socket');
+  var id = 0;
+  var outputs = {};
+  var started = {};
+  var websocket = new WebSocket('ws://' + window.location.host + '/socket');
 
-	websocket.onclose = function() {
-		console.log('websocket connection closed');
-	}
+  websocket.onclose = function() {
+    console.log('websocket connection closed');
+  }
 
-	websocket.onmessage = function(e) {
-		var m = JSON.parse(e.data);
-		var output = outputs[m.Id];
-		if (output === null)
-			return;
-		if (!started[m.Id]) {
-			output({Kind: 'start'});
-			started[m.Id] = true;
-		}
-		output({Kind: m.Kind, Body: m.Body});
-	}
+  websocket.onmessage = function(e) {
+    var m = JSON.parse(e.data);
+    var output = outputs[m.Id];
+    if (output === null)
+      return;
+    if (!started[m.Id]) {
+      output({Kind: 'start'});
+      started[m.Id] = true;
+    }
+    output({Kind: m.Kind, Body: m.Body});
+  }
 
-	function send(m) {
-		websocket.send(JSON.stringify(m));
-	}
+  function send(m) {
+    websocket.send(JSON.stringify(m));
+  }
 
-	return {
-		Run: function(body, output, options) {
-			var thisID = id+'';
-			id++;
-			outputs[thisID] = output;
-			send({Id: thisID, Kind: 'run', Body: body, Options: options});
-			return {
-				Kill: function() {
-					send({Id: thisID, Kind: 'kill'});
-				}
-			};
-		}
-	};
+  return {
+    Run: function(body, output, options) {
+      var thisID = id+'';
+      id++;
+      outputs[thisID] = output;
+      send({Id: thisID, Kind: 'run', Body: body, Options: options});
+      return {
+        Kill: function() {
+          send({Id: thisID, Kind: 'kill'});
+        }
+      };
+    }
+  };
 }
 
 function PlaygroundOutput(el) {
-	'use strict';
+  'use strict';
 
-	return function(write) {
-		if (write.Kind == 'start') {
-			el.innerHTML = '';
-			return;
-		}
+  return function(write) {
+    if (write.Kind == 'start') {
+      el.innerHTML = '';
+      return;
+    }
 
-		var cl = 'system';
-		if (write.Kind == 'stdout' || write.Kind == 'stderr')
-			cl = write.Kind;
+    var cl = 'system';
+    if (write.Kind == 'stdout' || write.Kind == 'stderr')
+      cl = write.Kind;
 
-		var m = write.Body;
-		if (write.Kind == 'end')
-			m = '\nProgram exited' + (m?(': '+m):'.');
+    var m = write.Body;
+    if (write.Kind == 'end')
+      m = '\nProgram exited' + (m?(': '+m):'.');
 
-		if (m.indexOf('IMAGE:') === 0) {
-			// TODO(adg): buffer all writes before creating image
-			var url = 'data:image/png;base64,' + m.substr(6);
-			var img = document.createElement('img');
-			img.src = url;
-			el.appendChild(img);
-			return;
-		}
+    if (m.indexOf('IMAGE:') === 0) {
+      // TODO(adg): buffer all writes before creating image
+      var url = 'data:image/png;base64,' + m.substr(6);
+      var img = document.createElement('img');
+      img.src = url;
+      el.appendChild(img);
+      return;
+    }
 
-		// ^L clears the screen.
-		var s = m.split('\x0c');
-		if (s.length > 1) {
-			el.innerHTML = '';
-			m = s.pop();
-		}
+    // ^L clears the screen.
+    var s = m.split('\x0c');
+    if (s.length > 1) {
+      el.innerHTML = '';
+      m = s.pop();
+    }
 
-		m = m.replace(/&/g, '&amp;');
-		m = m.replace(/</g, '&lt;');
-		m = m.replace(/>/g, '&gt;');
+    m = m.replace(/&/g, '&amp;');
+    m = m.replace(/</g, '&lt;');
+    m = m.replace(/>/g, '&gt;');
 
-		var needScroll = (el.scrollTop + el.offsetHeight) == el.scrollHeight;
+    var needScroll = (el.scrollTop + el.offsetHeight) == el.scrollHeight;
 
-		var span = document.createElement('span');
-		span.className = cl;
-		span.innerHTML = m;
-		el.appendChild(span);
+    var span = document.createElement('span');
+    span.className = cl;
+    span.innerHTML = m;
+    el.appendChild(span);
 
-		if (needScroll)
-			el.scrollTop = el.scrollHeight - el.offsetHeight;
-	}
+    if (needScroll)
+      el.scrollTop = el.scrollHeight - el.offsetHeight;
+  }
 }
 
 var playgroundOptions = {}
 
 function goPlaygroundOptions(opts) {
-	playgroundOptions = $.extend({}, playgroundOptions, opts);
+  playgroundOptions = $.extend({}, playgroundOptions, opts);
 }
 
 (function() {
@@ -242,7 +242,7 @@ function goPlaygroundOptions(opts) {
   //  enableHistory - enable using HTML5 history API (optional)
   //  transport - playground transport to use (default is HTTPTransport)
   function playground(opts) {
-		var opts = $.extend(opts, playgroundOptions);
+    var opts = $.extend(opts, playgroundOptions);
     var code = $(opts.codeEl);
     var transport = opts['transport'] || new HTTPTransport();
     var running;
