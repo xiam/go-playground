@@ -16,7 +16,7 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-var flagCompileURL = flag.String("c", "https://play.golang.org/compile?output=json", "Services prefix.")
+var flagCompileURL = flag.String("s", "https://play.golang.org/compile?output=json", "Sandbox service URL.")
 
 func init() {
 	http.HandleFunc("/compile", compileHandler)
