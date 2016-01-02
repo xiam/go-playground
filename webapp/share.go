@@ -1,4 +1,4 @@
-// Copyright 2011 The Go Authors.  All rights reserved.
+// Copyright 2011-2016 The Go Authors.  All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -22,7 +22,7 @@ const (
 )
 
 var (
-	flagDatabaseFile = flag.String("db", "snippets.db", "Snippets database.")
+	flagDatabaseFile = flag.String("db", "playground.db", "Database file.")
 	flagAllowShare   = flag.Bool("allow-share", false, "Allow storing and sharing snippets.")
 )
 
@@ -45,6 +45,13 @@ func (s *Snippet) Id() string {
 	return fmt.Sprintf("%x", sum)
 }
 
+func createBucket(name []byte) error {
+	return db.Update(func(tx *bolt.Tx) error {
+		_, err := tx.CreateBucketIfNotExists(name)
+		return err
+	})
+}
+
 func init() {
 	var err error
 	http.HandleFunc("/share", shareHandler)
@@ -52,19 +59,11 @@ func init() {
 		log.Fatal(err)
 	}
 
-	err = db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists(bucketSnippets)
-		return err
-	})
-	if err != nil {
+	if err = createBucket(bucketSnippets); err != nil {
 		log.Fatal(err)
 	}
 
-	err = db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists(bucketConfig)
-		return err
-	})
-	if err != nil {
+	if err = createBucket(bucketConfig); err != nil {
 		log.Fatal(err)
 	}
 

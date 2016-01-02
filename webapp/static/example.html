@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+	<head>
+		<title>The Go Playground</title>
+		<link rel="stylesheet" href="/static/example.css">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<script src="/static/playground.js"></script>
+		<script src="/static/snippets.js"></script>
+
+    <link rel="shortcut icon" href="/static/favicon.ico" sizes="16x16 32x32" type="image/vnd.microsoft.icon">
+
+		<script>
+			goPlaygroundOptions({
+				'shareRedirect': '/p/'
+			});
+		</script>
+	</head>
+	<body>
+
+	<h2>Inline snippet example</h2>
+<textarea class="go-playground-snippet" data-title="Example (Hello World!)">
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	fmt.Printf("Hello world!")
+}
+</textarea>
+
+	</body>
+</html>
