@@ -16,7 +16,10 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-var flagCompileURL = flag.String("s", "https://play.golang.org/compile?output=json", "Sandbox service URL.")
+var (
+	flagCompileURL   = flag.String("s", "https://play.golang.org/compile?output=json", "Sandbox service URL.")
+	flagDisableCache = flag.Bool("disable-cache", false, "Disable cache.")
+)
 
 func init() {
 	http.HandleFunc("/compile", compileHandler)
@@ -52,7 +55,7 @@ func passThru(w io.Writer, req *http.Request) error {
 	err = db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket(bucketCache)
 		data := b.Get(key)
-		if data == nil {
+		if data == nil || *flagDisableCache {
 			client := http.Client{}
 			r, err := client.Post(*flagCompileURL, req.Header.Get("Content-Type"), &body)
 			if err != nil {
