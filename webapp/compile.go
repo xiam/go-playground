@@ -5,11 +5,15 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
+
+	"github.com/boltdb/bolt"
 )
 
 var flagCompileURL = flag.String("c", "https://play.golang.org/compile?output=json", "Services prefix.")
@@ -27,15 +31,47 @@ func compileHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func passThru(w io.Writer, req *http.Request) error {
-	client := http.Client{}
-	defer req.Body.Close()
-	r, err := client.Post(*flagCompileURL, req.Header.Get("Content-Type"), req.Body)
+	var body bytes.Buffer
+
+	_, err := io.Copy(&body, io.LimitReader(req.Body, maxSnippetSize+1))
+	req.Body.Close()
+
 	if err != nil {
+		return fmt.Errorf("Error reading body: %q", err)
+	}
+	if body.Len() > maxSnippetSize {
+		return fmt.Errorf("Snippet is too large")
+	}
+
+	snip := &Snippet{Body: body.Bytes()}
+	id := snip.Id()
+	key := []byte(id)
+
+	var output bytes.Buffer
+
+	err = db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket(bucketCache)
+		data := b.Get(key)
+		if data == nil {
+			client := http.Client{}
+			r, err := client.Post(*flagCompileURL, req.Header.Get("Content-Type"), &body)
+			if err != nil {
+				return err
+			}
+			defer r.Body.Close()
+
+			data, err = ioutil.ReadAll(r.Body)
+			if err = b.Put(key, data); err != nil {
+				return err
+			}
+		}
+		output.Write(data)
+		return nil
+	})
+
+	if _, err := io.Copy(w, &output); err != nil {
 		return err
 	}
-	defer r.Body.Close()
-	if _, err := io.Copy(w, r.Body); err != nil {
-		return err
-	}
+
 	return nil
 }

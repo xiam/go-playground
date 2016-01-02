@@ -29,6 +29,7 @@ var (
 var (
 	db             *bolt.DB
 	bucketSnippets = []byte("snippets")
+	bucketCache    = []byte("cache")
 	bucketConfig   = []byte("config")
 	salt           []byte
 )
@@ -64,6 +65,10 @@ func init() {
 	}
 
 	if err = createBucket(bucketConfig); err != nil {
+		log.Fatal(err)
+	}
+
+	if err = createBucket(bucketCache); err != nil {
 		log.Fatal(err)
 	}
 
