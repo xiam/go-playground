@@ -44,6 +44,8 @@ div.play .output {
 div.play .output pre {
   padding: 0;
   border-radius: 0;
+  background-color: #333;
+  color: #fff;
 }
 div.play .input,
 div.play .input textarea {
@@ -54,7 +56,7 @@ div.play .output {
   border: 1px solid #eee;
 }
 div.play .output {
-  background: #333;
+  background-color: #333;
   color: #fff;
 }
 div.play .buttons {
