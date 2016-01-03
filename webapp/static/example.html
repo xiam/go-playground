@@ -2,8 +2,19 @@
 <html>
   <head>
     <title>The Go Playground</title>
+    <!--
+      Default styles for the snippet.
+    -->
     <link rel="stylesheet" href="/static/example.css">
+
+    <!--
+      jQuery is (currently) required.
+    -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+
+    <!--
+      These two files are required.
+    -->
     <script src="/static/playground.js"></script>
     <script src="/static/snippets.js"></script>
 
@@ -26,7 +37,7 @@
         margin: 0;
       }
       a {
-        color: #009;
+        color: #00f;
       }
     </style>
 
@@ -37,18 +48,25 @@
     </script>
   </head>
   <body>
-
     <div id="wrap">
       <h2>Inline snippet example</h2>
-        <textarea class="go-playground-snippet" data-title="Example (Hello World!)">
+      <p>
+        This is an example of how to embed a playground snippet in your website.
+      </p>
+      <!--
+        1. Use class "go-playground-snippet"
+        2. Set a data-title for the snippet.
+        3. Add autocomplete="off" autocapitalize="off" spellcheck="false" attributes.
+      -->
+      <textarea class="go-playground-snippet" data-title="Example (Hello World!)" autocomplete="off" autocapitalize="off" spellcheck="false">
 package main
 
 import (
-  "fmt"
+&#09;"fmt"
 )
 
 func main() {
-  fmt.Printf("Hello world!")
+&#09;fmt.Printf("Hello world!")
 }</textarea>
       <div>
   </body>

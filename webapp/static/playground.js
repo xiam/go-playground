@@ -309,7 +309,7 @@ goPlaygroundOptions({});
       return true;
     }
     code.unbind('keydown').bind('keydown', keyHandler);
-    var outdiv = $(opts.outputEl).empty();
+    var outdiv = $(opts.outputEl).empty().hide();
     var output = $('<pre/>').appendTo(outdiv);
 
     function body() {
@@ -358,6 +358,7 @@ goPlaygroundOptions({});
       output.removeClass("error").text('Waiting for remote server...');
     }
     function run() {
+      $(opts.outputEl).fadeIn();
       loading();
       running = transport.Run(body(), highlightOutput(PlaygroundOutput(output[0])));
     }

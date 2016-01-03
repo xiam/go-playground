@@ -84,7 +84,7 @@
         '   <p class="exampleHeading toggleButton">▾ <span class="text">Example</span></p>'+
         '     <div class="play">'+
         '       <div class="input"></div>'+
-        '       <div class="output"><pre></pre></div>' +
+        '       <div class="output"></div>' +
         '       <div class="buttons">' +
         '         <a class="run" title="Run this code [shift-enter]">Run</a>' +
         '         <a class="fmt" title="Format this code">Format</a>' +
