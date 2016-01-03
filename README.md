@@ -191,6 +191,23 @@ cd webapp
 ./webapp -allow-share -s "http://localhost:8080/compile?output=json"
 ```
 
+Welcome to the world of remote code execution!
+
+### Extending compilation services
+
+By default users won't be able to install or use packages that are not part of
+the Go standard library, in case you want to showcase a special package you'll
+have to create a slightly different docker image:
+
+```
+FROM xiam/go-playground/unsafebox
+
+RUN go get github.com/myuser/mypackage
+RUN go get github.com/otheruser/otherpackage
+
+ENTRYPOINT ["/go/bin/sandbox"]
+```
+
 [1]: https://www.golang.org/
 [2]: https://play.golang.org/
 [3]: https://github.com/golang/playground
