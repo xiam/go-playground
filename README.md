@@ -14,7 +14,7 @@ However, if you ever need to showcase features that require network, a real
 filesystem, CGO or any kind of thing not supported or actively restricted by
 [NaCL](https://developer.chrome.com/native-client) you will be out of luck.
 
-This alternate Playground offers you more flexibility on that front, you can
+This alternative Playground offers you more flexibility on that front, you can
 choose when to use the sandbox and when not to.
 
 ## So, this is like the Go Playground?
