@@ -54,7 +54,7 @@ build and run Go code. See the main page at http://127.0.0.1:3000.
 
 Love those nice [live
 examples](https://golang.org/pkg/strings/#example_Contains) on the golang.org
-site? You can also run them using this Playground:
+site? You can also embed them in your website using this Playground:
 
 ![screen shot 2016-01-03 at 8 12 50 am](https://cloud.githubusercontent.com/assets/385670/12079219/9fd19f14-b1f6-11e5-949e-f36561a7f0ff.png)
 
@@ -91,7 +91,8 @@ See the available commands with `-h`:
 ## Too complicated, I just came here for the live examples
 
 If you're only insterested on embedding Go examples that run on the official Go
-Playground sandbox you can start coding something based on this snippet:
+Playground sandbox you can start coding something based on this snippet which
+just works:
 
 ```html
 <!DOCTYPE html>
