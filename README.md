@@ -17,14 +17,19 @@ filesystem, CGO or any kind of thing not supported or actively restricted by
 This alternate Playground offers you more flexibility on that front, you can
 choose when to use the sandbox and when not to.
 
-## So this is like the Go Playground_
+## So, this is like the Go Playground?
 
-Yes, it's actually a fork of it. You can see a live example of this
-playground here: https://play.golang.mx.
+Yes, it's actually a fork of it. You can see a live example of this playground
+here: https://play.golang.mx. Note that this sandbox uses the official Go
+Playground compilation service, therefore the same restrictions apply to it.
 
-## webapp
+## Frontend (webapp)
 
-This is like the
+The web app is the front end part of the Playground, it can do a few tasks of
+its own like storing snippets or formatting code but it delegates the
+compilation to an external service.
+
+This is similar to the
 [play.golang.org](https://github.com/golang/playground/tree/master/app) web
 app, except that it:
 
@@ -32,9 +37,6 @@ app, except that it:
 * Uses [boltdb](https://github.com/boltdb/bolt) to save data.
 * Can be configured to communicate with any other Go Playground service (the
   one that compiles and runs Go code), including the official one.
-
-See a live example of this playground at
-[https://play.golang.mx/](https://play.golang.mx/).
 
 You can build and run a Go Playground like this:
 
@@ -58,7 +60,6 @@ site? You can also run them using this Playground:
 
 See a local example at http://127.0.0.1:3000/example or a live one at
 https://play.golang.mx/example.
-
 
 If you're into [Docker][4] you can create and run a container like this:
 
@@ -87,10 +88,10 @@ See the available commands with `-h`:
         Sandbox service URL. (default "https://play.golang.org/compile?output=json")
 ```
 
-## Too complicated, I came here for the embedded examples
+## Too complicated, I just came here for the live examples
 
-If you're only insterested on embedding Go examples that run on the official
-sandbox you can code something based on this snippet:
+If you're only insterested on embedding Go examples that run on the official Go
+Playground sandbox you can start coding something based on this snippet:
 
 ```html
 <!DOCTYPE html>
@@ -128,7 +129,11 @@ func main() {
 </html>
 ```
 
-## sandbox
+It's OK to hotlink, but don't rely on it being available 24/7.
+
+## Compilation services
+
+### sandbox
 
 If you don't want to use the Go Playground service for building and running Go
 code you can also run your own service.
@@ -157,11 +162,11 @@ cd webapp
 ./webapp -allow-share -s "http://localhost:8080/compile?output=json"
 ```
 
-## unsafebox
+### unsafebox
 
-I basically took all the security measures out of the playground and now I
-offer you a dumbed down version of it which actually does not sandbox anything
-and will put your life at risk.
+I basically took out all the security measures of the original sandbox and now
+I offer you a dumbed down version of it which actually does not sandbox
+anything and will put your life at risk.
 
 This is a unrestricted linux/amd64 installation, you should not really use this
 box unless you're absolutely sure you know what you're doing and you're aware
