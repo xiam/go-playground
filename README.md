@@ -6,18 +6,21 @@ easily using the [golang/playground][3] repository at Github.
 
 ## What's wrong with the Go Playground?
 
-Nothing, really. The official Go Playground runs on a sandbox, which is the
-recommened way of doing things like that, since it minimizes the risk of
-crackers abusing the system.
+Nothing really. The official [Go Playground][1] runs on a [sandbox][5], which
+is the recommened way of doing things like executing code from untrusted
+sources, since it minimizes the risk of crackers abusing the system.
 
 However, if you ever need to showcase features that require network, a real
 filesystem, CGO or any kind of thing not supported or actively restricted by
 [NaCL](https://developer.chrome.com/native-client) you will be out of luck.
 
+This alternate Playground offers you more flexibility on that front, you can
+choose when to use the sandbox and when not to.
+
 ## So this is like the Go Playground_
 
-Yes, it's a fork of it. You can use this alternate playground if you need more
-flexibility.
+Yes, it's actually a fork of it. You can see a live example of this
+playground here: https://play.golang.mx.
 
 ## webapp
 
@@ -183,6 +186,7 @@ cd webapp
 ```
 
 [1]: https://www.golang.org/
-[2]: http://play.golang.org/
+[2]: https://play.golang.org/
 [3]: https://github.com/golang/playground
 [4]: https://www.docker.com/
+[5]: https://en.wikipedia.org/wiki/Sandbox_(computer_security)
