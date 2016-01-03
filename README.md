@@ -116,7 +116,7 @@ just works:
     </script>
   </head>
   <body>
-    <textarea class="go-playground-snippet" data-title="Example (Hello Playground!)" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <textarea class="go-playground-snippet" data-title="Example (Hello Playground!)">
 package main
 
 import (

@@ -101,6 +101,7 @@
         wrapper.insertBefore(el);
         wrapper.find('div.input').append(el);
         el.addClass("code");
+        el.attr("autocorrect", "off");
         el.attr("autocomplete", "off");
         el.attr("autocapitalize", "off");
         el.attr("spellcheck", "false");
