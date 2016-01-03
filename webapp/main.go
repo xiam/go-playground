@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	flagListenAddr = flag.String("l", ":3000", "Listen address.")
-	flagHelp       = flag.Bool("h", false, "Show help.")
+	flagListenAddr        = flag.String("l", ":3000", "Listen address.")
+	flagAllowOriginHeader = flag.String("o", "*", "Access-Control-Allow-Origin header.")
+	flagHelp              = flag.Bool("h", false, "Show help.")
 )
 
 func main() {

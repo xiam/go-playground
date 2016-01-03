@@ -25,7 +25,6 @@ type editData struct {
 
 func editHandler(w http.ResponseWriter, r *http.Request) {
 	snip := &Snippet{Body: []byte(helloPlayground)}
-
 	if strings.HasPrefix(r.URL.Path, "/p/") {
 		if !*flagAllowShare {
 			http.Error(w, "Forbidden", http.StatusForbidden)

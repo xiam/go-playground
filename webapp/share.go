@@ -125,5 +125,8 @@ func shareHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Access-Control-Allow-Methods", "POST")
+	w.Header().Set("Access-Control-Allow-Origin", *flagAllowOriginHeader)
+
 	fmt.Fprint(w, id)
 }

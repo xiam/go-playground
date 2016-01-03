@@ -84,7 +84,7 @@ function HTTPTransport() {
       seq++;
       var cur = seq;
       var playing;
-      $.ajax('/compile', {
+      $.ajax(playgroundOptions.compileURL, {
         type: 'POST',
         data: {'version': 2, 'body': body},
         dataType: 'json',
@@ -206,9 +206,17 @@ function PlaygroundOutput(el) {
 
 var playgroundOptions = {}
 
+var defaultOptions = {
+  'compileURL': '/compile',
+  'fmtURL': '/fmt',
+  'shareURL': '/share',
+};
+
 function goPlaygroundOptions(opts) {
-  playgroundOptions = $.extend({}, playgroundOptions, opts);
+  playgroundOptions = $.extend(defaultOptions, playgroundOptions, opts);
 }
+
+goPlaygroundOptions({});
 
 (function() {
   function lineHighlight(error) {
@@ -238,7 +246,6 @@ function goPlaygroundOptions(opts) {
   //  shareEl - share button element (optional)
   //  shareURLEl - share URL text input element (optional)
   //  shareRedirect - base URL to redirect to on share (optional)
-  //  toysEl - toys select element (optional)
   //  enableHistory - enable using HTML5 history API (optional)
   //  transport - playground transport to use (default is HTTPTransport)
   function playground(opts) {
@@ -361,7 +368,7 @@ function goPlaygroundOptions(opts) {
       if ($(opts.fmtImportEl).is(":checked")) {
         data["imports"] = "true";
       }
-      $.ajax("/fmt", {
+      $.ajax(playgroundOptions.fmtURL, {
         data: data,
         type: "POST",
         dataType: "json",
@@ -389,7 +396,7 @@ function goPlaygroundOptions(opts) {
         if (sharing) return;
         sharing = true;
         var sharingData = body();
-        $.ajax("/share", {
+        $.ajax(playgroundOptions.shareURL, {
           processData: false,
           data: sharingData,
           type: "POST",
@@ -399,7 +406,9 @@ function goPlaygroundOptions(opts) {
               alert("Server error; try again.");
               return;
             }
-            if (opts.shareRedirect) {
+            if (opts.shareOpenNewWindow) {
+              window.open(opts.shareRedirect + xhr.responseText, '_blank');
+            } else if (opts.shareRedirect) {
               window.location = opts.shareRedirect + xhr.responseText;
             }
             if (shareURL) {
@@ -413,23 +422,6 @@ function goPlaygroundOptions(opts) {
                 pushedEmpty = false;
               }
             }
-          }
-        });
-      });
-    }
-
-    if (opts.toysEl !== null) {
-      $(opts.toysEl).bind('change', function() {
-        var toy = $(this).val();
-        $.ajax("/doc/play/"+toy, {
-          processData: false,
-          type: "GET",
-          complete: function(xhr) {
-            if (xhr.status != 200) {
-              alert("Server error; try again.");
-              return;
-            }
-            setBody(xhr.responseText);
           }
         });
       });

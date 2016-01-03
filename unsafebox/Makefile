@@ -6,4 +6,4 @@ test: docker
 	docker run --rm playground/unsafebox test
 
 run:
-	docker run -d -p 8080:8080 -t playground/unsafebox
+	docker run -d -p 8080:8080 --name playground-unsafebox -t playground/unsafebox

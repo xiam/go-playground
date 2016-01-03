@@ -26,6 +26,9 @@ func init() {
 }
 
 func compileHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Methods", "POST")
+	w.Header().Set("Access-Control-Allow-Origin", *flagAllowOriginHeader)
+
 	if err := passThru(w, r); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Printf("compile error: %q", err)

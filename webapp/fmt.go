@@ -41,5 +41,8 @@ func fmtHandler(w http.ResponseWriter, r *http.Request) {
 		resp.Body = string(out)
 	}
 
+	w.Header().Set("Access-Control-Allow-Methods", "POST")
+	w.Header().Set("Access-Control-Allow-Origin", *flagAllowOriginHeader)
+
 	json.NewEncoder(w).Encode(resp)
 }
