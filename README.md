@@ -14,7 +14,7 @@ However, if you ever need to showcase features that require network, a real
 filesystem, CGO or any kind of thing not supported or actively restricted by
 [NaCL](https://developer.chrome.com/native-client) you will be out of luck.
 
-This alternative Playground offers you more flexibility on that front, you can
+This alternative playground offers you more flexibility on that front, you can
 choose when to use the sandbox and when not to.
 
 ## So, this is like the Go Playground?
@@ -25,7 +25,7 @@ Playground compilation service, therefore the same restrictions apply to it.
 
 ## Frontend (webapp)
 
-The web app is the front end part of the Playground, it can do a few tasks of
+The web app is the front end part of the playground, it can do a few tasks of
 its own like storing snippets or formatting code but it delegates the
 compilation to an external service.
 
@@ -193,11 +193,12 @@ cd webapp
 
 Welcome to the world of remote code execution!
 
-### Extending compilation services
+### Importing custom packages
 
-By default users won't be able to install or use packages that are not part of
-the Go standard library, in case you want to showcase a special package you'll
-have to create a slightly different docker image:
+Remember that playground users won't be able to install or use packages that
+are not part of the Go standard library, in case you want to showcase a special
+package you'll have to create a slightly different docker image on top of the
+sandbox or the unsafebox, see this `Dockerfile`:
 
 ```
 FROM xiam/go-playground/unsafebox
@@ -207,6 +208,18 @@ RUN go get github.com/otheruser/otherpackage
 
 ENTRYPOINT ["/go/bin/sandbox"]
 ```
+
+You can build that docker image and then start `webapp` using the `-s`
+parameter pointing to the docker image and you'll be able to import custom
+packages from your playground:
+
+```
+./webapp -disable-cache -s "http://custom.box/compile?output=json"
+```
+
+![screen shot 2016-01-03 at 2 32 00 pm](https://cloud.githubusercontent.com/assets/385670/12080650/d6037186-b226-11e5-8bd1-3b98627a1e03.png)
+
+Cool huh. How about using this playground on your Go next workshop?
 
 [1]: https://www.golang.org/
 [2]: https://play.golang.org/
