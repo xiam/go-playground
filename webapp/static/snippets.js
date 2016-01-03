@@ -14,6 +14,9 @@
         $(el).addClass('toggle').removeClass('toggleVisible');
       }
     });
+    if ($(el).find('.code').data("expanded")) {
+      $(el).addClass('toggleVisible').removeClass('toggle');
+    };
   }
 
   function bindToggles(selector) {
@@ -98,6 +101,9 @@
         wrapper.insertBefore(el);
         wrapper.find('div.input').append(el);
         el.addClass("code");
+        el.attr("autocomplete", "off");
+        el.attr("autocapitalize", "off");
+        el.attr("spellcheck", "false");
         el.data("initialized", 1);
       }
     }
