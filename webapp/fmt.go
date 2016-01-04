@@ -6,6 +6,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"go/format"
 	"net/http"
 
@@ -27,6 +28,12 @@ func fmtHandler(w http.ResponseWriter, r *http.Request) {
 		out []byte
 		err error
 	)
+
+	if len(in) > maxSnippetSize {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintln(w, "Compile server error.")
+		return
+	}
 
 	if r.FormValue("imports") != "" {
 		out, err = imports.Process("prog.go", in, nil)

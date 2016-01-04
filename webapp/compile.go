@@ -55,7 +55,7 @@ func passThru(w io.Writer, req *http.Request) error {
 
 	var output bytes.Buffer
 
-	err = db.Update(func(tx *bolt.Tx) error {
+	if err = db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket(bucketCache)
 		data := b.Get(key)
 		if data == nil || *flagDisableCache {
@@ -66,14 +66,19 @@ func passThru(w io.Writer, req *http.Request) error {
 			}
 			defer r.Body.Close()
 
-			data, err = ioutil.ReadAll(r.Body)
+			data, err = ioutil.ReadAll(io.LimitReader(r.Body, maxSnippetSize+1))
+			if len(data) > maxSnippetSize {
+				return fmt.Errorf("Output is too large.")
+			}
 			if err = b.Put(key, data); err != nil {
 				return err
 			}
 		}
 		output.Write(data)
 		return nil
-	})
+	}); err != nil {
+		return err
+	}
 
 	if _, err := io.Copy(w, &output); err != nil {
 		return err
