@@ -225,7 +225,7 @@ packages from your playground:
 ![screen shot 2016-01-03 at 2 32 00 pm](https://cloud.githubusercontent.com/assets/385670/12080650/d6037186-b226-11e5-8bd1-3b98627a1e03.png)
 
 Feel free to use this playground on your next workshop to demonstrate your Go
-projects to others? ;-)
+projects to others ;-)
 
 [1]: https://www.golang.org/
 [2]: https://play.golang.org/
