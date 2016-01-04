@@ -7,7 +7,7 @@ easily using the [golang/playground][3] repository at Github.
 ## What's wrong with the Go Playground?
 
 Nothing really. The official [Go Playground][1] runs on a [sandbox][5], which
-is the recommened way of doing things like executing code from untrusted
+is the recommended way of doing things like executing code from untrusted
 sources, since it minimizes the risk of crackers abusing the system.
 
 However, if you ever need to showcase features that require network, a real
@@ -90,7 +90,7 @@ See the available commands with `-h`:
 
 ## Too complicated, I just came here for the live examples
 
-If you're only insterested on embedding Go examples that run on the official Go
+If you're only interested on embedding Go examples that run on the official Go
 Playground sandbox you can start coding something based on this snippet which
 just works:
 
