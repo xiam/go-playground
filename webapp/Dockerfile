@@ -1,6 +1,6 @@
 FROM debian:jessie
 
-RUN apt-get update
+RUN apt-key update && apt-get update
 RUN apt-get install -y ca-certificates
 
 COPY app_linux_amd64 /bin/app
