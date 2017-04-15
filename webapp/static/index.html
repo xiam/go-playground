@@ -1,11 +1,15 @@
 <!doctype html>
 <html>
   <head>
-    <title>A Go Playground</title>
+    <title>Go Playground</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/codemirror.css">
+    <link rel="stylesheet" href="/static/codemirror-material.css">
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 
-    <script src="/static/jquery-linedtextarea.js"></script>
+    <script src="/static/codemirror.js"></script>
+    <script src="/static/codemirror-go.js"></script>
 
     <script src="/static/playground.js"></script>
     <script src="/static/playground-embed.js"></script>
@@ -15,6 +19,7 @@
     <script>
     $(document).ready(function() {
       playground({
+        'theme':        'material',
         'codeEl':       '#code',
         'outputEl':     '#output',
         'runEl':        '#run',
@@ -27,6 +32,7 @@
         'enableHistory': true
       });
       playgroundEmbed({
+        'theme':        'material',
         'codeEl':       '#code',
         {{if $.Share}}
         'shareEl':      '#share',
@@ -35,9 +41,7 @@
         'embedLabelEl': '#embedLabel',
         'embedHTMLEl':  '#shareURL'
       });
-      $('#code').linedtextarea();
       // Avoid line wrapping.
-      $('#code').attr('wrap', 'off');
       var about = $('#about');
       about.click(function(e) {
         if ($(e.target).is('a')) {
@@ -52,12 +56,6 @@
         }
         about.show();
       })
-      // Preserve "Imports" checkbox value between sessions.
-      if (readCookie('playgroundImports') == 'true')
-        $('#imports').attr('checked','checked');
-      $('#imports').change(function() {
-        createCookie('playgroundImports', $(this).is(':checked') ? 'true' : '');
-      });
       // Fire Google Analytics events for Run/Share button clicks.
       if (window.trackEvent) {
         $('#run').click(function() {
@@ -68,35 +66,14 @@
         });
       }
     });
-
-    function createCookie(name, value) {
-      document.cookie = name+"="+value+"; path=/";
-    }
-
-    function readCookie(name) {
-      var nameEQ = name + "=";
-      var ca = document.cookie.split(';');
-      for(var i=0;i < ca.length;i++) {
-        var c = ca[i];
-        while (c.charAt(0)==' ') c = c.substring(1,c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-      }
-      return null;
-    }
     </script>
   </head>
   <body itemscope itemtype="http://schema.org/CreativeWork">
     <div id="banner">
-      <div id="head" itemprop="name">A Go Playground</div>
+      <div id="head" itemprop="name">Go Playground</div>
       <div id="controls">
         <input type="button" value="Run" id="run">
         <input type="button" value="Format" id="fmt">
-        <div id="importsBox">
-          <label title="Rewrite imports on Format">
-            <input type="checkbox" id="imports">
-            Imports
-          </label>
-        </div>
         {{if $.Share}}
         <input type="button" value="Share" id="share">
         <input type="text" id="shareURL">
@@ -136,5 +113,6 @@
         repository.
       </p>
     </div>
+
   </body>
 </html>

@@ -7,7 +7,7 @@ body {
   margin: 0;
   width: 100%;
   height: 100%;
-  background: #000;
+  background: #222;
 }
 a {
   color: #1CA8B2;
@@ -25,11 +25,11 @@ a {
 
 }
 #wrap {
-  background-color: #222;
+  background-color: #263238;
 }
 #about {
   display: none;
-  z-index: 1;
+  z-index: 100;
   padding: 10px 40px;
   font-size: 16px;
   font-family: Helvetica, Arial, sans-serif;
@@ -45,7 +45,7 @@ a {
   margin-bottom: 1em;
 }
 #code, #output, pre, .lines {
-  font-family: Menlo, Courier New, monospace;
+  font-family: 'Go', 'Inconsolata', monospace;
   font-size: 11pt;
 }
 
@@ -88,8 +88,8 @@ a {
   right: 0;
   top: 0;
   height: 50px;
-  background-color: #333;
-  color: #eee;
+  background-color: #222;
+  color: #efefef;
 }
 #head {
   float: left;
@@ -105,7 +105,10 @@ a {
 }
 #run {
   background-color: #1CA8B2;
-  border: 1px solid #333;
+  color: #ddd;
+}
+#run:hover {
+  color: #fff;
 }
 #about {
   background-color: #333;
@@ -124,9 +127,15 @@ input[type=button],
   top: 1px;
 }
 input[type=button] {
-  background: #222;
-  border: 1px solid #444;
+  background: #333;
+  border: 1px solid #222;
   cursor: pointer;
+  color: #bbb;
+  border-radius: 4px;
+}
+input[type=button]:hover {
+  color: #fff;
+  border: 1px solid #eee;
 }
 #importsBox {
   position: relative;
@@ -143,10 +152,10 @@ input[type=button] {
 }
 #shareURL {
   width: 280px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  background: #eee;
-  color: black;
+  font-size: 12px;
+  border: 1px solid #333;
+  background: #555;
+  color: #eee;
   height: 23px;
 }
 #embedLabel {
@@ -166,9 +175,15 @@ input[type=button] {
   background-color: #222;
 }
 .lines div.lineerror {
-  background-color: #000;
+  background-color: #222;
   color: #900;
 }
 .exit {
   color: #555;
+}
+
+#wrap .CodeMirror {
+  height: 100%;
+  font-family: 'Go', 'Inconsolata', monospace;
+  font-size: 11pt;
 }

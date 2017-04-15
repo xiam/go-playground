@@ -198,6 +198,7 @@ function PlaygroundOutput(el) {
     span.className = cl;
     span.innerHTML = m;
     el.appendChild(span);
+    $(el).fadeIn()
 
     if (needScroll)
       el.scrollTop = el.scrollHeight - el.offsetHeight;
@@ -254,69 +255,24 @@ goPlaygroundOptions({});
     var transport = opts['transport'] || new HTTPTransport();
     var running;
 
-    // autoindent helpers.
-    function insertTabs(n) {
-      // find the selection start and end
-      var start = code[0].selectionStart;
-      var end   = code[0].selectionEnd;
-      // split the textarea content into two, and insert n tabs
-      var v = code[0].value;
-      var u = v.substr(0, start);
-      for (var i=0; i<n; i++) {
-        u += "\t";
-      }
-      u += v.substr(end);
-      // set revised content
-      code[0].value = u;
-      // reset caret position after inserted tabs
-      code[0].selectionStart = start+n;
-      code[0].selectionEnd = start+n;
-    }
-    function autoindent(el) {
-      var curpos = el.selectionStart;
-      var tabs = 0;
-      while (curpos > 0) {
-        curpos--;
-        if (el.value[curpos] == "\t") {
-          tabs++;
-        } else if (tabs > 0 || el.value[curpos] == "\n") {
-          break;
-        }
-      }
-      setTimeout(function() {
-        insertTabs(tabs);
-      }, 1);
-    }
+    var editor = CodeMirror.fromTextArea(code[0], {
+      lineNumbers: true,
+      indentWithTabs: true,
+      mode: 'go',
+      smartIndent: true,
+      tabSize: 4,
+      indentUnit: 4,
+      theme: opts['theme']
+    });
 
-    function keyHandler(e) {
-      if (e.keyCode == 9 && !e.ctrlKey) { // tab (but not ctrl-tab)
-        insertTabs(1);
-        e.preventDefault();
-        return false;
-      }
-      if (e.keyCode == 13) { // enter
-        if (e.shiftKey) { // +shift
-          run();
-          e.preventDefault();
-          return false;
-        } if (e.ctrlKey) { // +control
-          fmt();
-          e.preventDefault();
-        } else {
-          autoindent(e.target);
-        }
-      }
-      return true;
-    }
-    code.unbind('keydown').bind('keydown', keyHandler);
     var outdiv = $(opts.outputEl).empty().hide();
     var output = $('<pre/>').appendTo(outdiv);
 
     function body() {
-      return $(opts.codeEl).val();
+      return editor.getValue();
     }
     function setBody(text) {
-      $(opts.codeEl).val(text);
+      editor.setValue(text);
     }
     function origin(href) {
       return (""+href).split("/").slice(0, 3).join("/");
@@ -350,12 +306,12 @@ goPlaygroundOptions({});
       if (running) running.Kill();
       lineClear();
       lineHighlight(error);
-      output.empty().addClass("error").text(error);
+      output.empty().addClass("error").fadeIn().text(error);
     }
     function loading() {
       lineClear();
       if (running) running.Kill();
-      output.removeClass("error").text('Waiting for remote server...');
+      output.removeClass("error").fadeIn().text('Waiting for remote server...');
     }
     function run() {
       $(opts.outputEl).fadeIn();
@@ -366,9 +322,7 @@ goPlaygroundOptions({});
     function fmt() {
       loading();
       var data = {"body": body()};
-      if ($(opts.fmtImportEl).is(":checked")) {
-        data["imports"] = "true";
-      }
+      data["imports"] = "true";
       $.ajax(playgroundOptions.fmtURL, {
         data: data,
         type: "POST",
