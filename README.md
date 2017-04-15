@@ -101,8 +101,11 @@ just works:
     <meta charset="utf-8" />
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+
     <link href="//play.golang.mx/static/example.css" rel="stylesheet" type="text/css" />
-    <script src="//play.golang.mx/static/playground.js"></script>
+    <link href="//play.golang.mx/static/codemirror.css" rel="stylesheet" type="text/css" />
+
+    <script src="//play.golang.mx/static/playground-full.js"></script>
     <script src="//play.golang.mx/static/snippets.js"></script>
 
     <script>

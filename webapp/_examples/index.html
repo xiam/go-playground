@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+
+    <link href="//127.0.0.1:3000/static/example.css" rel="stylesheet" type="text/css" />
+    <link href="//127.0.0.1:3000/static/codemirror.css" rel="stylesheet" type="text/css" />
+
+    <script src="//127.0.0.1:3000/static/playground-full.js"></script>
+    <script src="//127.0.0.1:3000/static/snippets.js"></script>
+
+    <script>
+    goPlaygroundOptions({
+      'shareRedirect': '//127.0.0.1:3000/p/',
+      'shareURL': '//127.0.0.1:3000/share',
+      'compileURL': '//127.0.0.1:3000/compile',
+      'fmtURL': '//127.0.0.1:3000/fmt',
+      'shareOpenNewWindow': true
+    });
+    </script>
+  </head>
+  <body>
+    <textarea class="go-playground-snippet" data-title="Example (Hello Playground!)">
+package main
+
+import (
+&#09;"fmt"
+)
+
+func main() {
+&#09;fmt.Printf("Hello Playground!")
+}</textarea>
+  </body>
+</html>

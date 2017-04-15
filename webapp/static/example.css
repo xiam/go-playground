@@ -6,20 +6,22 @@
 
 /* example and drop-down playground */
 div.play {
-  padding: 0 20px 40px 20px;
+  padding: 0px;
+  border: 1px solid #eee;
 }
 div.play pre,
 div.play textarea,
 div.play .lines {
   padding: 0;
   margin: 0;
-  font-family: Menlo, monospace;
+  font-family: Go, Menlo, Inconsolata, monospace;
   font-size: 14px;
 }
 div.play .input {
-  padding: 10px;
-  margin-top: 10px;
+  padding: 0px;
+  margin-top: 0px;
   overflow: hidden;
+  height: 100%;
 }
 div.play .input textarea {
   width: 100%;
@@ -51,10 +53,6 @@ div.play .input,
 div.play .input textarea {
   background: #f0f0f0;
 }
-div.play .input,
-div.play .output {
-  border: 1px solid #eee;
-}
 div.play .output {
   background-color: #333;
   color: #fff;
@@ -71,7 +69,9 @@ div.play .buttons a {
   cursor: pointer;
 }
 .output .stderr {
-  color: #e00;
+  display: block;
+  color: #fff;
+  white-space: pre-line;
 }
 .output .system {
   color: #999;

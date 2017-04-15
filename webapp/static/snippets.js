@@ -40,17 +40,6 @@
           'fmtEl':    $('.fmt', el),
           'shareEl':  $('.share', el),
         });
-
-        // Make the code textarea resize to fit content.
-        var resize = function() {
-          code.height(0);
-          var h = code[0].scrollHeight;
-          code.height(h+20); // minimize bouncing.
-          code.closest('.input').height(h);
-        };
-        code.on('keydown', resize);
-        code.on('keyup', resize);
-        code.keyup(); // resize now.
       };
 
       // If example already visible, set up playground now.
