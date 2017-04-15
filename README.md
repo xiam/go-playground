@@ -65,8 +65,8 @@ If you're into [Docker][4] you can create and run a container like this:
 
 ```
 cd webapp
-make docker
-make run
+make docker-build
+make docker-run
 ```
 
 See the available commands with `-h`:

@@ -1,5 +1,5 @@
-CONTAINER_IMAGE ?= xiam/playgo-web
-CONTAINER_NAME  ?= my-go-playground
+CONTAINER_IMAGE ?= xiam/go-playground
+CONTAINER_NAME  ?= go-playground
 
 require-glide:
 	@if [ -z "$$(which glide)" ]; then \
