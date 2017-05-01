@@ -26,5 +26,5 @@ docker-run:
 	docker run -d -p 127.0.0.1:3000:3000 --name $(CONTAINER_NAME) -t $(CONTAINER_IMAGE)
 
 docker-push: docker-build
-	docker tag $(TAG) $(CONTAINER_IMAGE):$(TAG) && \
+	docker tag $(CONTAINER_IMAGE) $(CONTAINER_IMAGE):$(TAG) && \
 	docker push $(CONTAINER_IMAGE):$(TAG)
