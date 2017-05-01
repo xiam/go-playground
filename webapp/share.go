@@ -6,7 +6,6 @@ package main
 
 import (
 	"bytes"
-	"crypto/rand"
 	"crypto/sha1"
 	"flag"
 	"fmt"
@@ -51,44 +50,6 @@ func createBucket(name []byte) error {
 		_, err := tx.CreateBucketIfNotExists(name)
 		return err
 	})
-}
-
-func init() {
-	var err error
-	http.HandleFunc("/share", shareHandler)
-	if db, err = bolt.Open(*flagDatabaseFile, 0600, nil); err != nil {
-		log.Fatal(err)
-	}
-
-	if err = createBucket(bucketSnippets); err != nil {
-		log.Fatal(err)
-	}
-
-	if err = createBucket(bucketConfig); err != nil {
-		log.Fatal(err)
-	}
-
-	if err = createBucket(bucketCache); err != nil {
-		log.Fatal(err)
-	}
-
-	err = db.Update(func(tx *bolt.Tx) error {
-		var err error
-		b := tx.Bucket(bucketConfig)
-		salt = b.Get([]byte("salt"))
-		if salt == nil {
-			salt = make([]byte, 30)
-			if _, err = rand.Read(salt); err != nil {
-				return err
-			}
-			b.Put([]byte("salt"), salt)
-		}
-		return nil
-	})
-
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 func shareHandler(w http.ResponseWriter, r *http.Request) {
