@@ -1,5 +1,6 @@
 CONTAINER_IMAGE ?= xiam/go-playground
 CONTAINER_NAME  ?= go-playground
+TAG ?= latest
 
 require-glide:
 	@if [ -z "$$(which glide)" ]; then \
@@ -24,5 +25,6 @@ docker-run:
 	(docker rm $(CONTAINER_NAME) || exit 0) && \
 	docker run -d -p 127.0.0.1:3000:3000 --name $(CONTAINER_NAME) -t $(CONTAINER_IMAGE)
 
-docker-push:
-	docker push $(CONTAINER_IMAGE)
+docker-push: docker-build
+	docker tag $(TAG) $(CONTAINER_IMAGE):$(TAG) && \
+	docker push $(CONTAINER_IMAGE):$(TAG)
