@@ -1,16 +1,15 @@
 FROM debian:jessie
 
-RUN apt-key update && apt-get update
-RUN apt-get install -y ca-certificates
+RUN apt-key update && \
+    apt-get update && \
+    apt-get install -y ca-certificates && \
+    mkdir /var/app -p && \
+    mkdir /var/data -p
 
 COPY app_linux_amd64 /bin/app
-
-RUN mkdir /var/app -p
-
-RUN mkdir /var/data -p
 
 COPY static /var/app/static
 
 WORKDIR /var/app
 
-ENTRYPOINT [ "/bin/app" ]
+ENTRYPOINT [ "/bin/app", "-allow-share" ]
