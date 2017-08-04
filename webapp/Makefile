@@ -23,7 +23,7 @@ docker-build: require-glide require-uglifyjs
 docker-run:
 	(docker stop $(CONTAINER_NAME) || exit 0) && \
 	(docker rm $(CONTAINER_NAME) || exit 0) && \
-	docker run -d -p 127.0.0.1:3000:3000 --name $(CONTAINER_NAME) -t $(CONTAINER_IMAGE)
+	docker run -d -p 3000:3000 --name $(CONTAINER_NAME) -t $(CONTAINER_IMAGE)
 
 docker-push: docker-build
 	docker tag $(CONTAINER_IMAGE) $(CONTAINER_IMAGE):$(TAG) && \
