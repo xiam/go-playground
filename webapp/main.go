@@ -20,6 +20,8 @@ var (
 )
 
 func main() {
+	var err error
+
 	flag.Parse()
 
 	if *flagHelp {
@@ -28,47 +30,44 @@ func main() {
 	}
 
 	if *flagAllowShare {
-		var err error
-
 		http.HandleFunc("/share", shareHandler)
-		if db, err = bolt.Open(*flagDatabaseFile, 0600, nil); err != nil {
-			log.Fatal(err)
-		}
+	}
 
-		if err = createBucket(bucketSnippets); err != nil {
-			log.Fatal(err)
-		}
+	if db, err = bolt.Open(*flagDatabaseFile, 0600, nil); err != nil {
+		log.Fatal(err)
+	}
 
-		if err = createBucket(bucketConfig); err != nil {
-			log.Fatal(err)
-		}
+	if err = createBucket(bucketSnippets); err != nil {
+		log.Fatal(err)
+	}
 
-		if err = createBucket(bucketCache); err != nil {
-			log.Fatal(err)
-		}
+	if err = createBucket(bucketConfig); err != nil {
+		log.Fatal(err)
+	}
 
-		err = db.Update(func(tx *bolt.Tx) error {
-			var err error
-			b := tx.Bucket(bucketConfig)
-			salt = b.Get([]byte("salt"))
-			if salt == nil {
-				salt = make([]byte, 30)
-				if _, err = rand.Read(salt); err != nil {
-					return err
-				}
-				b.Put([]byte("salt"), salt)
+	if err = createBucket(bucketCache); err != nil {
+		log.Fatal(err)
+	}
+
+	if err = db.Update(func(tx *bolt.Tx) error {
+		var err error
+		b := tx.Bucket(bucketConfig)
+		salt = b.Get([]byte("salt"))
+		if salt == nil {
+			salt = make([]byte, 30)
+			if _, err = rand.Read(salt); err != nil {
+				return err
 			}
-			return nil
-		})
-
-		if err != nil {
-			log.Fatal(err)
+			b.Put([]byte("salt"), salt)
 		}
+		return nil
+	}); err != nil {
+		log.Fatal(err)
 	}
 
 	log.Printf("Serving Go playground at %v...\n", *flagListenAddr)
 
-	if err := http.ListenAndServe(*flagListenAddr, nil); err != nil {
+	if err = http.ListenAndServe(*flagListenAddr, nil); err != nil {
 		log.Fatal(err)
 	}
 }
