@@ -1,14 +1,17 @@
-IMAGE_NAME ?= xiam/playgo-sandbox
+CONTAINER_IMAGE ?= xiam/playgo-sandbox
+CONTAINER_NAME 	?= go-playground-sandbox
 
 docker: Dockerfile
-	docker build -t $(IMAGE_NAME) .
+	docker build -t $(CONTAINER_IMAGE) .
 
 test: docker
 	go test
-	docker run --rm $(IMAGE_NAME) test
+	docker run --rm $(CONTAINER_IMAGE) test
 
 run:
-	docker run -d -p 8080:8080 -t $(IMAGE_NAME)
+	(docker stop $(CONTAINER_NAME) || exit 0) && \
+    (docker rm $(CONTAINER_NAME) || exit 0) && \
+	docker run -d -p 8080:8080 --name $(CONTAINER_NAME) -t $(CONTAINER_IMAGE)
 
 push:
-	docker push $(IMAGE_NAME)
+	docker push $(CONTAINER_IMAGE)
