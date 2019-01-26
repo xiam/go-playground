@@ -6,7 +6,6 @@ package main
 
 import (
 	"bytes"
-	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -14,11 +13,6 @@ import (
 	"net/http"
 
 	"github.com/boltdb/bolt"
-)
-
-var (
-	flagCompileURL   = flag.String("s", "https://play.golang.org/compile?output=json", "Sandbox service URL.")
-	flagDisableCache = flag.Bool("disable-cache", false, "Disable cache.")
 )
 
 func init() {
@@ -54,29 +48,47 @@ func passThru(w io.Writer, req *http.Request) error {
 	key := []byte(id)
 
 	var output bytes.Buffer
+	var data []byte
 
-	if err = db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket(bucketCache)
-		data := b.Get(key)
-		if data == nil || *flagDisableCache {
-			client := http.Client{}
-			r, err := client.Post(*flagCompileURL, req.Header.Get("Content-Type"), &body)
-			if err != nil {
-				return err
-			}
-			defer r.Body.Close()
+	if *flagAllowShare {
+		if err = db.View(func(tx *bolt.Tx) error {
+			data = tx.Bucket(bucketCache).Get(key)
+			return nil
+		}); err != nil {
+			return err
+		}
+	}
 
-			data, err = ioutil.ReadAll(io.LimitReader(r.Body, maxSnippetSize+1))
-			if len(data) > maxSnippetSize {
-				return fmt.Errorf("Output is too large.")
-			}
+	if data == nil || *flagDisableCache {
+		client := http.Client{}
+		r, err := client.Post(*flagCompileURL, req.Header.Get("Content-Type"), &body)
+		if err != nil {
+			return err
+		}
+		defer r.Body.Close()
+
+		data, err = ioutil.ReadAll(io.LimitReader(r.Body, maxSnippetSize+1))
+		if len(data) > maxSnippetSize {
+			return fmt.Errorf("Output is too large.")
+		}
+		if err != nil {
+			return err
+		}
+	}
+
+	if *flagAllowShare {
+		if err = db.Update(func(tx *bolt.Tx) error {
+			b := tx.Bucket(bucketCache)
 			if err = b.Put(key, data); err != nil {
 				return err
 			}
+			return nil
+		}); err != nil {
+			return err
 		}
-		output.Write(data)
-		return nil
-	}); err != nil {
+	}
+
+	if _, err := output.Write(data); err != nil {
 		return err
 	}
 

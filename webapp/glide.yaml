@@ -1,7 +1,0 @@
-package: github.com/xiam/go-playground/webapp
-import:
-- package: github.com/boltdb/bolt
-  version: ^1.3.0
-- package: golang.org/x/tools
-  subpackages:
-  - imports

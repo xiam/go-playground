@@ -14,9 +14,12 @@ import (
 )
 
 var (
+	flagDisableCache = flag.Bool("z", false, "Disable cache.")
+	flagHelp         = flag.Bool("h", false, "Show help.")
+
 	flagListenAddr        = flag.String("l", ":3000", "Listen address.")
+	flagCompileURL        = flag.String("c", "https://play.golang.org/compile?output=json", "Compiler service URL.")
 	flagAllowOriginHeader = flag.String("o", "*", "Access-Control-Allow-Origin header.")
-	flagHelp              = flag.Bool("h", false, "Show help.")
 )
 
 func main() {
@@ -31,6 +34,7 @@ func main() {
 		var err error
 
 		http.HandleFunc("/share", shareHandler)
+
 		if db, err = bolt.Open(*flagDatabaseFile, 0600, nil); err != nil {
 			log.Fatal(err)
 		}
@@ -66,7 +70,7 @@ func main() {
 		}
 	}
 
-	log.Printf("Serving Go playground at %v...\n", *flagListenAddr)
+	log.Printf("Serving Go playground at %v (with compiler %v)\n", *flagListenAddr, *flagCompileURL)
 
 	if err := http.ListenAndServe(*flagListenAddr, nil); err != nil {
 		log.Fatal(err)
