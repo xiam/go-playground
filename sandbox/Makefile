@@ -1,24 +1,33 @@
-CONTAINER_IMAGE   ?= xiam/go-playground-sandbox
+IMAGE_NAME        ?= xiam/go-playground-sandbox
+IMAGE_TAG         ?= latest
+IMAGE_VERSION     ?=
+
+GIT_SHORTHASH     ?= $(shell git rev-parse --short HEAD)
+
 CONTAINER_NAME    ?= go-playground-sandbox
 
-TAG               ?= $(shell date +'%Y.%-m.%-d')
-
-docker-build: Dockerfile
-	docker build -t $(CONTAINER_IMAGE) .
-
-docker-push: docker-build
-	docker tag $(CONTAINER_IMAGE) $(CONTAINER_IMAGE):$(TAG) && \
-	docker tag $(CONTAINER_IMAGE):$(TAG) $(CONTAINER_IMAGE):latest && \
-	docker push $(CONTAINER_IMAGE):$(TAG) && \
-	docker push $(CONTAINER_IMAGE):latest
+.PHONY: vendor
 
 test: docker-build
 	go test && \
-	docker run --rm $(CONTAINER_IMAGE) test
+	docker run --rm $(IMAGE_NAME):$(GIT_SHORTHASH) test
 
-docker-run: docker-build
+fmt:
+	for i in $$(find -name \*.go | grep -v vendor); do \
+		gofmt -w $$i && \
+		goimports -w $$i; \
+	done
+
+docker-build:
+	docker build -t $(IMAGE_NAME):$(GIT_SHORTHASH) .
+
+docker-run:
 	(docker rm -f $(CONTAINER_NAME) || exit 0) && \
 	docker run \
 		-p 0.0.0.0:8080:8080 \
 		--name $(CONTAINER_NAME) \
-		-t $(CONTAINER_IMAGE)
+
+docker-push: docker-build
+	docker tag $(IMAGE_NAME):$(GIT_SHORTHASH) $(IMAGE_NAME):$(IMAGE_TAG) && \
+	docker push $(IMAGE_NAME):$(GIT_SHORTHASH) && \
+	docker push $(IMAGE_NAME):$(IMAGE_TAG)

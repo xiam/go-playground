@@ -1,6 +1,9 @@
-dist: xenial
+dist: bionic
 
-language: bash
+language: go
+
+go:
+  - 1.13
 
 sudo: required
 

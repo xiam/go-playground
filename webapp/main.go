@@ -70,8 +70,7 @@ func main() {
 		}
 	}
 
-	log.Printf("Serving Go playground at %v (with compiler %v)\n", *flagListenAddr, *flagCompileURL)
-
+	log.Printf("Serving Go Playground at %v (with compiler %v)\n", *flagListenAddr, *flagCompileURL)
 	if err := http.ListenAndServe(*flagListenAddr, nil); err != nil {
 		log.Fatal(err)
 	}

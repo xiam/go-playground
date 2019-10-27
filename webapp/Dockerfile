@@ -1,15 +1,16 @@
-FROM node:8.15 AS node-builder
+FROM node:10-alpine AS node-builder
 
-RUN apt-get update && \
-  apt-get install -y make
+RUN apk update && \
+	apk add make
 
 RUN npm install uglify-js -g
 
 COPY static /app/static
 
-RUN cd /app/static && make
+RUN cd /app/static && \
+	make
 
-FROM golang:1.11 AS go-builder
+FROM golang:1.13 AS go-builder
 
 WORKDIR /go/src/github.com/xiam/go-playground/webapp/
 
@@ -17,7 +18,7 @@ COPY . .
 
 RUN go install github.com/xiam/go-playground/webapp
 
-FROM debian:jessie
+FROM debian:buster
 
 RUN apt-get update && \
   apt-get install -y ca-certificates

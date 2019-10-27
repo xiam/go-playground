@@ -90,7 +90,7 @@ func compileAndRun(req *Request) (*Response, error) {
 
 	exe := filepath.Join(tmpDir, "a.out")
 	cmd := exec.Command("go", "build", "-o", exe, in)
-	cmd.Env = []string{"CGO=1", "GOOS=linux", "GOARCH=amd64", "GOPATH=" + os.Getenv("GOPATH")}
+	cmd.Env = []string{"CGO=1", "GOOS=linux", "GOARCH=amd64", "GOPATH=" + os.Getenv("GOPATH"), "GOCACHE=" + os.Getenv("GOCACHE")}
 	if out, err := cmd.CombinedOutput(); err != nil {
 		if _, ok := err.(*exec.ExitError); ok {
 			// Return compile errors to the user.
@@ -107,7 +107,7 @@ func compileAndRun(req *Request) (*Response, error) {
 		}
 		return nil, fmt.Errorf("error building go source: %v", err)
 	}
-	//cmd = exec.Command("sel_ldr_x86_64", "-l", "/dev/null", "-S", "-e", exe)
+
 	cmd = exec.Command(exe)
 	rec := new(Recorder)
 	cmd.Stdout = rec.Stdout()
