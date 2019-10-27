@@ -1,2 +1,2 @@
 docker-push:
-	parallel $(MAKE) -C {} ::: webapp unsafebox sandbox
+	parallel $(MAKE) -C {} docker-push ::: webapp unsafebox sandbox
