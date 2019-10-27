@@ -18,7 +18,7 @@ fmt:
 		goimports -w $$i; \
 	done
 
-docker-build: fmt
+docker-build:
 	docker build -t $(IMAGE_NAME):$(GIT_SHORTHASH) .
 
 docker-push: docker-build

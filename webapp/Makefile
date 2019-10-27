@@ -27,7 +27,7 @@ clean:
 	rm -rf bin/ && \
 	mkdir -p bin
 
-docker-build: fmt vendor
+docker-build: vendor
 	docker build -t $(IMAGE_NAME):$(GIT_SHORTHASH) .
 
 docker-run:
