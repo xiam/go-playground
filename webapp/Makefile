@@ -41,13 +41,3 @@ docker-push: docker-build
 	docker tag $(IMAGE_NAME):$(GIT_SHORTHASH) $(IMAGE_NAME):$(IMAGE_TAG) && \
 	docker push $(IMAGE_NAME):$(GIT_SHORTHASH) && \
 	docker push $(IMAGE_NAME):$(IMAGE_TAG)
-
-require-version:
-	@test $(IMAGE_VERSION) || (echo "missing IMAGE_VERSION" && exit 1)
-
-release: require-version docker-build
-	git fetch --tags && \
-	git tag -a v$(IMAGE_VERSION) -m 'release v$(IMAGE_VERSION)' && \
-	git push origin v$(IMAGE_VERSION) && \
-	IMAGE_TAG=$(IMAGE_VERSION) $(MAKE) docker-push && \
-	IMAGE_TAG=latest $(MAKE) docker-push
