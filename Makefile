@@ -1,12 +1,12 @@
 IMAGE_VERSION     ?=
 
 docker-push:
-	parallel $(MAKE) -C {} docker-push ::: webapp unsafebox sandbox
+	parallel IMAGE_VERSION="$(IMAGE_VERSION)" $(MAKE) -C {} docker-push ::: webapp unsafebox sandbox
 
 require-version:
 	@test $(IMAGE_VERSION) || (echo "missing IMAGE_VERSION" && exit 1)
 
-release: require-version docker-push
+release: require-version
 	git fetch --tags && \
 	git tag -a v$(IMAGE_VERSION) -m 'release v$(IMAGE_VERSION)' && \
 	git push origin v$(IMAGE_VERSION) && \
