@@ -6,12 +6,12 @@ The official [Go Playground][1] runs on a [sandbox][5], which is the
 recommended way of doing things like executing code from untrusted sources,
 since it minimizes security risks.
 
-However, if you ever need to showcase features that require network access, a
+However, if you ever want to showcase features that require network access, a
 real filesystem, CGO or any kind of thing that is not supported or actively
 restricted by [NaCL](https://developer.chrome.com/native-client) you're out of
 luck.
 
-This alternative (and insecure) playground offers you more flexibility on that
+This *unrestricted and insecure* playground offers you more flexibility on that
 front, you can choose when to use the sandboxed environment and when not to.
 
 ## Quick start with docker
@@ -44,9 +44,6 @@ docker run \
 ```
 
 ## Front-end
-
-The front-end service can do a few tasks of its own like storing snippets or
-formatting code but it delegates the compilation to an external service.
 
 This is similar to the
 [play.golang.org](https://github.com/golang/playground/tree/master/app) web
@@ -91,7 +88,7 @@ that no matter what you do, people will try to abuse the system and they will
 probably succeed.
 
 Ok, now that you're warned, you can (but shouldn't) build and run this
-dangerous box like this:
+*dangerous box* like this:
 
 ```
 cd unsafebox

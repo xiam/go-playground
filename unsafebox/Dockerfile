@@ -1,13 +1,14 @@
 # Copyright 2017 The Go Authors. All rights reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
-FROM debian:jessie as builder
+FROM debian:buster as builder
 LABEL maintainer "golang-dev@googlegroups.com"
 
 ENV GOPATH /go
+ENV GOCACHE /go/.cache
 ENV PATH /usr/local/go/bin:$GOPATH/bin:$PATH
 ENV GOROOT_BOOTSTRAP /usr/local/gobootstrap
-ENV GO_VERSION 1.11.1
+ENV GO_VERSION 1.13.3
 
 RUN apt-get update && apt-get install -y ca-certificates curl
 
@@ -21,13 +22,15 @@ RUN tar -C /usr/local/ -vxzf /tmp/go.tar.gz
 COPY . /go/src/playground/
 RUN go install playground
 
-FROM debian:jessie
+FROM debian:buster
 
 RUN apt-get update && apt-get install -y ca-certificates git --no-install-recommends
 
 COPY --from=builder /usr/local/go /usr/local/go
 
 ENV GOPATH /go
+ENV GOCACHE /tmp/.cache
+
 ENV PATH /usr/local/go/bin:$GOPATH/bin:$PATH
 
 # Add and compile tour packages
