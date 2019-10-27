@@ -6,13 +6,16 @@ GIT_SHORTHASH     ?= $(shell git rev-parse --short HEAD)
 
 CONTAINER_NAME    ?= go-playground
 
-.PHONY: vendor
+.PHONY: vendor static
 
 build: clean vendor fmt
 	go build -o bin/webapp *.go
 
-run:
-	go run main.go
+run: static
+	go run *.go
+
+static:
+	$(MAKE) -C static
 
 vendor:
 	go mod vendor
