@@ -8,7 +8,7 @@ ENV GOPATH /go
 ENV GOCACHE /go/.cache
 ENV PATH /usr/local/go/bin:$GOPATH/bin:$PATH
 ENV GOROOT_BOOTSTRAP /usr/local/gobootstrap
-ENV GO_VERSION 1.13.3
+ENV GO_VERSION 1.15
 
 RUN apt-get update && apt-get install -y ca-certificates curl
 
