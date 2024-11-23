@@ -37,7 +37,7 @@ type Snippet struct {
 	Body []byte
 }
 
-func (s *Snippet) Id() string {
+func (s *Snippet) ID() string {
 	h := sha1.New()
 	h.Write(salt)
 	h.Write(s.Body)
@@ -53,11 +53,6 @@ func createBucket(name []byte) error {
 }
 
 func shareHandler(w http.ResponseWriter, r *http.Request) {
-	if !*flagAllowShare || r.Method != "POST" {
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
-	}
-
 	var body bytes.Buffer
 	_, err := io.Copy(&body, io.LimitReader(r.Body, maxSnippetSize+1))
 	r.Body.Close()
@@ -72,7 +67,7 @@ func shareHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	snip := &Snippet{Body: body.Bytes()}
-	id := snip.Id()
+	id := snip.ID()
 	key := []byte(id)
 
 	err = db.Update(func(tx *bolt.Tx) error {

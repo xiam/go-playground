@@ -15,10 +15,6 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-func init() {
-	http.HandleFunc("/compile", compileHandler)
-}
-
 func compileHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	w.Header().Set("Access-Control-Allow-Origin", *flagAllowOriginHeader)
@@ -44,7 +40,7 @@ func passThru(w io.Writer, req *http.Request) error {
 	}
 
 	snip := &Snippet{Body: body.Bytes()}
-	id := snip.Id()
+	id := snip.ID()
 	key := []byte(id)
 
 	var output bytes.Buffer

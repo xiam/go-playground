@@ -1,7 +1,5 @@
 # Your Own Go Playground
 
-[![Build Status](https://travis-ci.org/xiam/go-playground.svg?branch=master)](https://travis-ci.org/xiam/go-playground)
-
 The official [Go Playground][1] runs on a [sandbox][5], which is the
 recommended way of doing things like executing code from untrusted sources,
 since it minimizes security risks.

@@ -11,6 +11,8 @@ import (
 	"net/http"
 
 	"github.com/boltdb/bolt"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 var (
@@ -30,10 +32,18 @@ func main() {
 		return
 	}
 
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+
+	r.Get("/", createHandler)
+
+	r.Handle("/*", http.FileServer(http.Dir("./static")))
+
+	r.Post("/fmt", fmtHandler)
+	r.Post("/compile", compileHandler)
+
 	if *flagAllowShare {
 		var err error
-
-		http.HandleFunc("/share", shareHandler)
 
 		if db, err = bolt.Open(*flagDatabaseFile, 0600, nil); err != nil {
 			log.Fatal(err)
@@ -64,14 +74,14 @@ func main() {
 			}
 			return nil
 		})
-
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		r.Get("/p/*", editHandler)
+		r.Post("/share", shareHandler)
 	}
 
-	log.Printf("Serving Go Playground at %v (with compiler %v)\n", *flagListenAddr, *flagCompileURL)
-	if err := http.ListenAndServe(*flagListenAddr, nil); err != nil {
-		log.Fatal(err)
-	}
+	log.Printf("Serving Go Playground at %v\n", *flagListenAddr)
+	http.ListenAndServe(*flagListenAddr, r)
 }
