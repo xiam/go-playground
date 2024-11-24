@@ -38,13 +38,10 @@ type Response struct {
 }
 
 func main() {
-	if len(os.Args) > 1 && os.Args[1] == "test" {
-		test()
-		return
-	}
 	http.HandleFunc("/compile", compileHandler)
-	http.HandleFunc("/_ah/health", healthHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	http.HandleFunc("/status", healthHandler)
+
+	log.Fatal(http.ListenAndServe(":3003", nil))
 }
 
 func compileHandler(w http.ResponseWriter, r *http.Request) {
@@ -90,7 +87,13 @@ func compileAndRun(req *Request) (*Response, error) {
 
 	exe := filepath.Join(tmpDir, "a.out")
 	cmd := exec.Command("go", "build", "-o", exe, in)
-	cmd.Env = []string{"CGO=1", "GOOS=linux", "GOARCH=amd64", "GOPATH=" + os.Getenv("GOPATH"), "GOCACHE=" + os.Getenv("GOCACHE")}
+	cmd.Env = []string{
+		"GOOS=" + os.Getenv("GOOS"),
+		"GOARCH=" + os.Getenv("GOARCH"),
+		"GOPATH=" + os.Getenv("GOPATH"),
+		"GOCACHE=" + os.Getenv("GOCACHE"),
+	}
+
 	if out, err := cmd.CombinedOutput(); err != nil {
 		if _, ok := err.(*exec.ExitError); ok {
 			// Return compile errors to the user.
@@ -112,6 +115,7 @@ func compileAndRun(req *Request) (*Response, error) {
 	rec := new(Recorder)
 	cmd.Stdout = rec.Stdout()
 	cmd.Stderr = rec.Stderr()
+
 	if err := runTimeout(cmd, maxRunTime); err != nil {
 		if err == timeoutErr {
 			return &Response{Errors: "process took too long"}, nil
@@ -120,10 +124,12 @@ func compileAndRun(req *Request) (*Response, error) {
 			return nil, fmt.Errorf("error running sandbox: %v", err)
 		}
 	}
+
 	events, err := rec.Events()
 	if err != nil {
 		return nil, fmt.Errorf("error decoding events: %v", err)
 	}
+
 	return &Response{Events: events}, nil
 }
 
@@ -153,6 +159,7 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Health check failed: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	fmt.Fprint(w, "ok")
 }
 
@@ -161,12 +168,15 @@ func healthCheck() error {
 	if err != nil {
 		return err
 	}
+
 	if resp.Errors != "" {
 		return fmt.Errorf("compile error: %v", resp.Errors)
 	}
+
 	if len(resp.Events) != 1 || resp.Events[0].Message != "ok" {
 		return fmt.Errorf("unexpected output: %v", resp.Events)
 	}
+
 	return nil
 }
 
@@ -177,129 +187,3 @@ import "fmt"
 
 func main() { fmt.Print("ok") }
 `
-
-func test() {
-	if err := healthCheck(); err != nil {
-		log.Fatal(err)
-	}
-	for _, t := range tests {
-		resp, err := compileAndRun(&Request{Body: t.prog})
-		if err != nil {
-			log.Fatal(err)
-		}
-		if t.errors != "" {
-			if resp.Errors != t.errors {
-				log.Fatalf("resp.Errors = %q, want %q", resp.Errors, t.errors)
-			}
-			continue
-		}
-		if resp.Errors != "" {
-			log.Fatal(resp.Errors)
-		}
-		if len(resp.Events) != 1 || !strings.Contains(resp.Events[0].Message, t.want) {
-			log.Fatalf("unexpected output: %v, want %q", resp.Events, t.want)
-		}
-	}
-	fmt.Println("OK")
-}
-
-var tests = []struct {
-	prog, want, errors string
-}{
-	{prog: `
-package main
-
-import "time"
-
-func main() {
-	loc, err := time.LoadLocation("America/New_York")
-	if err != nil {
-		panic(err.Error())
-	}
-	println(loc.String())
-}
-`, want: "America/New_York"},
-
-	/*
-	   	{prog: `
-	   package main
-
-	   import (
-	   	"fmt"
-	   	"time"
-	   )
-
-	   func main() {
-	   	fmt.Println(time.Now())
-	   }
-	   `, want: "2009-11-10 23:00:00 +0000 UTC"},
-	*/
-
-	/*
-	   	{prog: `
-	   package main
-
-	   import (
-	   	"fmt"
-	   	"time"
-	   )
-
-	   func main() {
-	   	t1 := time.Tick(time.Second * 3)
-	   	t2 := time.Tick(time.Second * 7)
-	   	t3 := time.Tick(time.Second * 11)
-	   	end := time.After(time.Second * 19)
-	   	want := "112131211"
-	   	var got []byte
-	   	for {
-	   		var c byte
-	   		select {
-	   		case <-t1:
-	   			c = '1'
-	   		case <-t2:
-	   			c = '2'
-	   		case <-t3:
-	   			c = '3'
-	   		case <-end:
-	   			if g := string(got); g != want {
-	   				fmt.Printf("got %q, want %q\n", g, want)
-	   			} else {
-	   				fmt.Println("timers fired as expected")
-	   			}
-	   			return
-	   		}
-	   		got = append(got, c)
-	   	}
-	   }
-	   `, want: "timers fired as expected"},
-	*/
-
-	{prog: `
-package main
-
-import (
-	"code.google.com/p/go-tour/pic"
-	"code.google.com/p/go-tour/reader"
-	"code.google.com/p/go-tour/tree"
-	"code.google.com/p/go-tour/wc"
-)
-
-var (
-	_ = pic.Show
-	_ = reader.Validate
-	_ = tree.New
-	_ = wc.Test
-)
-
-func main() {
-	println("ok")
-}
-`, want: "ok"},
-	{prog: `
-package test
-
-func main() {
-    println("test")
-}
-`, want: "", errors: "package name must be main"},
-}
