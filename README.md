@@ -7,7 +7,7 @@ way of executing code from untrusted sources since it minimizes security risks.
 
 However, if you ever want to showcase features that require network access, a
 real filesystem, CGO, or anything that is not supported or actively restricted
-by [NaCL][6] you're out of luck.
+by the sandbox you're out of luck.
 
 This **unrestricted and insecure playground** offers you the sense of adventure
 and danger you're looking for by removing all restrictions and security
@@ -59,7 +59,7 @@ docker run \
 ```
 
 To make the web interface use the custom executor, you'll have to connect both
-containers to the same [docker network][7], and specify the address of the
+containers to the same [docker network][6], and specify the address of the
 executor using the `-c` flag.
 
 ```sh
@@ -98,5 +98,4 @@ under the BSD license. See the [LICENSE](LICENSE) file for details.
 [3]: https://github.com/golang/playground
 [4]: https://www.docker.com/
 [5]: https://en.wikipedia.org/wiki/Sandbox_(computer_security)
-[6]: https://en.wikipedia.org/wiki/Google_Native_Client
-[7]: https://docs.docker.com/engine/network/
+[6]: https://docs.docker.com/engine/network/
