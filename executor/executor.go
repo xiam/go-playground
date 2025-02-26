@@ -2,12 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// TODO(adg): add logging
-// TODO(proppy): restrict memory use
-// TODO(adg): send exit code to user
-
-// Command sandbox is an HTTP server that takes requests containing go
-// source files, and builds and executes them in a NaCl sanbox.
 package main
 
 import (
@@ -16,7 +10,6 @@ import (
 	"fmt"
 	"go/parser"
 	"go/token"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -24,6 +17,10 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+)
+
+var (
+	bindAddr = ":3003"
 )
 
 const maxRunTime = 5 * time.Second
@@ -41,7 +38,25 @@ func main() {
 	http.HandleFunc("/compile", compileHandler)
 	http.HandleFunc("/status", healthHandler)
 
-	log.Fatal(http.ListenAndServe(":3003", nil))
+	log.Printf("GOOS=" + os.Getenv("GOOS"))
+	log.Printf("GOARCH=" + os.Getenv("GOARCH"))
+	log.Printf("GOPATH=" + os.Getenv("GOPATH"))
+	log.Printf("GOCACHE=" + os.Getenv("GOCACHE"))
+	log.Printf("TMPDIR=" + os.Getenv("TMPDIR"))
+
+	log.Printf("Listening on %s...", bindAddr)
+
+	var errCh = make(chan error)
+	go func() {
+		errCh <- http.ListenAndServe(bindAddr, nil)
+	}()
+	err := <-errCh
+
+	if err != nil {
+		if !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("Error starting server: %v", err)
+		}
+	}
 }
 
 func compileHandler(w http.ResponseWriter, r *http.Request) {
@@ -67,14 +82,14 @@ func compileHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func compileAndRun(req *Request) (*Response, error) {
-	tmpDir, err := ioutil.TempDir("", "sandbox")
+	tmpDir, err := os.MkdirTemp("", "sandbox")
 	if err != nil {
 		return nil, fmt.Errorf("error creating temp directory: %v", err)
 	}
 	defer os.RemoveAll(tmpDir)
 
 	in := filepath.Join(tmpDir, "main.go")
-	if err := ioutil.WriteFile(in, []byte(req.Body), 0400); err != nil {
+	if err := os.WriteFile(in, []byte(req.Body), 0400); err != nil {
 		return nil, fmt.Errorf("error creating temp file %q: %v", in, err)
 	}
 
@@ -139,10 +154,13 @@ func runTimeout(cmd *exec.Cmd, d time.Duration) error {
 	if err := cmd.Start(); err != nil {
 		return err
 	}
+
 	errc := make(chan error, 1)
+
 	go func() {
 		errc <- cmd.Wait()
 	}()
+
 	t := time.NewTimer(d)
 	select {
 	case err := <-errc:

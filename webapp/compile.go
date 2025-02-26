@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -63,7 +62,7 @@ func passThru(w io.Writer, req *http.Request) error {
 		}
 		defer r.Body.Close()
 
-		data, err = ioutil.ReadAll(io.LimitReader(r.Body, maxSnippetSize+1))
+		data, err = io.ReadAll(io.LimitReader(r.Body, maxSnippetSize+1))
 		if len(data) > maxSnippetSize {
 			return fmt.Errorf("Output is too large.")
 		}
