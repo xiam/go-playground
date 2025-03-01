@@ -23,6 +23,17 @@ var (
 	bindAddr = ":3003"
 )
 
+var (
+	allowedEnvs = []string{
+		"GOOS",
+		"GOARCH",
+		"GOPATH",
+		"GOCACHE",
+		"TMPDIR",
+		"GOTMPDIR",
+	}
+)
+
 const maxRunTime = 5 * time.Second
 
 type Request struct {
@@ -38,11 +49,11 @@ func main() {
 	http.HandleFunc("/compile", compileHandler)
 	http.HandleFunc("/status", healthHandler)
 
-	log.Printf("GOOS=" + os.Getenv("GOOS"))
-	log.Printf("GOARCH=" + os.Getenv("GOARCH"))
-	log.Printf("GOPATH=" + os.Getenv("GOPATH"))
-	log.Printf("GOCACHE=" + os.Getenv("GOCACHE"))
-	log.Printf("TMPDIR=" + os.Getenv("TMPDIR"))
+	for _, envName := range allowedEnvs {
+		if os.Getenv(envName) != "" {
+			log.Printf("%s=%s", envName, os.Getenv(envName))
+		}
+	}
 
 	log.Printf("Listening on %s...", bindAddr)
 
@@ -86,6 +97,7 @@ func compileAndRun(req *Request) (*Response, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error creating temp directory: %v", err)
 	}
+
 	defer os.RemoveAll(tmpDir)
 
 	in := filepath.Join(tmpDir, "main.go")
@@ -101,12 +113,14 @@ func compileAndRun(req *Request) (*Response, error) {
 	}
 
 	exe := filepath.Join(tmpDir, "a.out")
+	log.Printf("Compiling %s to %s", in, exe)
+
 	cmd := exec.Command("go", "build", "-o", exe, in)
-	cmd.Env = []string{
-		"GOOS=" + os.Getenv("GOOS"),
-		"GOARCH=" + os.Getenv("GOARCH"),
-		"GOPATH=" + os.Getenv("GOPATH"),
-		"GOCACHE=" + os.Getenv("GOCACHE"),
+	cmd.Dir = tmpDir
+
+	cmd.Env = []string{}
+	for _, envName := range allowedEnvs {
+		cmd.Env = append(cmd.Env, envName+"="+os.Getenv(envName))
 	}
 
 	if out, err := cmd.CombinedOutput(); err != nil {
@@ -128,6 +142,7 @@ func compileAndRun(req *Request) (*Response, error) {
 
 	cmd = exec.Command(exe)
 	rec := new(Recorder)
+
 	cmd.Stdout = rec.Stdout()
 	cmd.Stderr = rec.Stderr()
 
@@ -151,6 +166,15 @@ func compileAndRun(req *Request) (*Response, error) {
 var timeoutErr = errors.New("process timed out")
 
 func runTimeout(cmd *exec.Cmd, d time.Duration) error {
+	command := strings.Join(cmd.Args, " ")
+
+	start := time.Now()
+	log.Printf("Running %s", command)
+	defer func() {
+		elapsed := time.Since(start)
+		log.Printf("Finished running %s, took %s", command, elapsed)
+	}()
+
 	if err := cmd.Start(); err != nil {
 		return err
 	}
