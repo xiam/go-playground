@@ -37,7 +37,7 @@ func main() {
 
 	r.Get("/", createHandler)
 
-	r.Handle("/*", http.FileServer(http.Dir("./static")))
+	r.Handle("/*", http.StripPrefix("/", http.FileServer(http.Dir("./static"))))
 
 	r.Post("/fmt", fmtHandler)
 	r.Post("/compile", compileHandler)
