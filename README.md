@@ -73,21 +73,6 @@ docker run \
             -c https://go-playground-executor:3003
 ```
 
-## Showcasing custom packages
-
-It won't be possible for users of your playground to install custom packages by
-themselves.
-
-If you want to showcase a special package, you can create a custom Docker
-image:
-
-```
-FROM xiam/go-playground:latest
-
-# Install custom packages
-RUN go get github.com/myorg/mypackage
-```
-
 # License
 
 This project is derived from the official [Go Playground][3] and is licensed
